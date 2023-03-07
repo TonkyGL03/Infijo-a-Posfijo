@@ -1,0 +1,127 @@
+#ifndef CONVERTIDOR_DE_NOTACION_POSTFIJA_HPP_INCLUDED
+#define CONVERTIDOR_DE_NOTACION_POSTFIJA_HPP_INCLUDED
+
+#include<iostream>
+#include "stack.hpp"
+#include "Cola.hpp"
+/*NO ADMITE ESPACIOS EN LA OPERACION DE CONVERSION*/
+
+class PostfixNotation{
+private:
+    Stack<std::string> stackOperators;
+    Queue<std::string> r;
+    Queue<std::string> operationToConvert;
+    int sizeOperationToConvert;
+    string lastElementOperationToConvert;
+    std::string result;
+
+    int validateOperationAndOperator(const std::string&);
+    void bifurcateElement( );
+
+
+public:
+     PostfixNotation(const std::string &);
+    string initialize();
+
+
+
+};
+
+using namespace std;
+
+PostfixNotation::PostfixNotation(const string& s){ //CONSTRUCTOR ASIGNADOR
+sizeOperationToConvert = s.size();
+for(int i ( 0 ); i < sizeOperationToConvert ; i++){
+string temp;
+temp = s[ i ];
+        operationToConvert.enqueue( temp );
+}
+}
+
+//Private
+int PostfixNotation::validateOperationAndOperator(const string& c){
+            fflush(stdin);
+
+            if(c == "("){return 4;}
+            if(c==")"){return 5;}
+            if( c == "^" ){ return 3; }
+            if( c == "/" or c == "*" ){ return 2; }
+            if( c == "+" or c == "-" ){ return 1; } else { return 0; }
+
+}
+
+void PostfixNotation::bifurcateElement(){
+
+            if(validateOperationAndOperator( operationToConvert.getFront( ) ) == 4 ){
+                stackOperators.push( operationToConvert.dequeue( ) );
+            }else{
+            if( validateOperationAndOperator( operationToConvert.getFront( ) ) == 0){
+                r.enqueue( operationToConvert.dequeue( ) );
+            }else{
+            if( stackOperators.isEmpty() and validateOperationAndOperator( operationToConvert.getFront( ) ) < 4 ){
+                stackOperators.push( operationToConvert.dequeue() );
+            }else{
+                if( validateOperationAndOperator( operationToConvert.getFront( ) ) > validateOperationAndOperator( stackOperators.getTop(  ) ) and validateOperationAndOperator( operationToConvert.getFront( ) ) < 4 and validateOperationAndOperator( stackOperators.getTop(  ) ) < 4 ){
+                    stackOperators.push( operationToConvert.dequeue( ) );
+                }else{
+                    if( validateOperationAndOperator( operationToConvert.getFront( ) ) <= validateOperationAndOperator( stackOperators.getTop( ) ) and validateOperationAndOperator( operationToConvert.getFront( )) < 4 and  validateOperationAndOperator( stackOperators.getTop( ) ) < 4 and validateOperationAndOperator( stackOperators.getTop( ) ) != 4 ){
+                        r.enqueue( stackOperators.pop( ) );
+                  }else{
+                      if( validateOperationAndOperator( stackOperators.getTop( ) ) == 4 ){
+                        stackOperators.push(operationToConvert.dequeue() );
+                            }else{
+                                if(validateOperationAndOperator(operationToConvert.getFront( ) ) == 5 ){
+                                    do{
+                                       r.enqueue( stackOperators.pop( ) );
+                                    }while(  validateOperationAndOperator( stackOperators.getTop( ) ) != 4 );
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+}//endFunction
+
+//Public
+
+
+
+
+string PostfixNotation::initialize()
+{
+        do{
+
+            bifurcateElement();
+
+        }while( !operationToConvert.isEmpty( ) );
+
+        //Vaciar pila de operadores
+            while(!stackOperators.isEmpty()){
+                r.enqueue( stackOperators.pop() );
+            }
+
+        //Convertir cola a una String
+        char b[ sizeOperationToConvert ];
+        string a;
+        for(int i(0); i < sizeOperationToConvert; i++ ){
+
+          if( validateOperationAndOperator( r.getFront() ) != 4 and validateOperationAndOperator( r.getFront() ) != 5){
+            a = r.dequeue( );
+            b[ i ] = a[ 0 ];
+}else{r.dequeue();}
+
+        }
+          result = b;
+            return result;
+
+
+    }//endFunction
+
+
+#endif // CONVERTIDOR_DE_NOTACION_POSTFIJA_HPP_INCLUDED
